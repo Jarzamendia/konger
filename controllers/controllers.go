@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/jarzamendia/konger/kong"
+	"github.com/jarzamendia/konger/models"
 )
 
 //HomeHandler Handler
@@ -39,50 +39,63 @@ func ConsumersHandler(w http.ResponseWriter, r *http.Request) {
 //ConsumersNameHandler Handler
 func ConsumersNameHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	var consumer models.ConsumersInfo
 
-	consumerName := vars["Name"]
+	decoder := json.NewDecoder(r.Body)
 
-	consumer := kong.GetConsumerByName(consumerName)
+	err := decoder.Decode(&consumer)
 
-	jsonResult, err := json.Marshal(consumer)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	consumer = kong.GetConsumerByName(consumer)
+
+	json.NewEncoder(w).Encode(&consumer)
 
 }
 
 //ConsumersIDHandler Handler
 func ConsumersIDHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	var consumer models.ConsumersInfo
 
-	consumerID := vars["ID"]
+	decoder := json.NewDecoder(r.Body)
 
-	consumer := kong.GetConsumerByID(consumerID)
+	err := decoder.Decode(&consumer)
 
-	jsonResult, err := json.Marshal(consumer)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	consumer = kong.GetConsumerByID(consumer)
+
+	json.NewEncoder(w).Encode(&consumer)
+
+}
+
+//ConsumersCreateNameHandler Handler
+func ConsumersCreateNameHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var consumer models.ConsumersInfo
+
+	decoder := json.NewDecoder(r.Body)
+
+	err := decoder.Decode(&consumer)
+
+	if err != nil {
+		panic(err)
+	}
+
+	consumer = kong.CreateConsumer(consumer)
+
+	json.NewEncoder(w).Encode(&consumer)
 
 }
 
@@ -110,103 +123,101 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//ServicesNameHandler Handler
+//ServicesNameHandler models.ServiceInfo / models.ServiceInfo
 func ServicesNameHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	var service models.ServiceInfo
 
-	serviceName := vars["Name"]
+	decoder := json.NewDecoder(r.Body)
 
-	service := kong.GetConsumerByName(serviceName)
+	err := decoder.Decode(&service)
 
-	jsonResult, err := json.Marshal(service)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	service = kong.GetServiceByName(service)
+
+	json.NewEncoder(w).Encode(&service)
 
 }
 
-//ServicesIDHandler Handler
+//ServicesIDHandler models.ServiceInfo / models.ServiceInfo
 func ServicesIDHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	var service models.ServiceInfo
 
-	serviceID := vars["ID"]
+	decoder := json.NewDecoder(r.Body)
 
-	service := kong.GetServiceByID(serviceID)
+	err := decoder.Decode(&service)
 
-	jsonResult, err := json.Marshal(service)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	service = kong.GetServiceByID(service)
+
+	json.NewEncoder(w).Encode(&service)
+
+}
+
+//ServicesCreateHandler models.ServiceInfo / models.ServiceInfo
+func ServicesCreateHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var service models.ServiceInfo
+
+	_ = json.NewDecoder(r.Body).Decode(&service)
+
+	service = kong.CreateService(service)
+
+	json.NewEncoder(w).Encode(&service)
 
 }
 
 //RoutesNameHandler Handler
 func RoutesNameHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	var service models.ServiceInfo
 
-	routeName := vars["Name"]
+	decoder := json.NewDecoder(r.Body)
 
-	routes := kong.GetRouteByServiceName(routeName)
+	err := decoder.Decode(&service)
 
-	jsonResult, err := json.Marshal(routes)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	route := kong.GetRouteByServiceName(service)
+
+	json.NewEncoder(w).Encode(&route)
 
 }
 
 //RoutesIDHandler Handler
 func RoutesIDHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-	w.WriteHeader(http.StatusOK)
+	var service models.ServiceInfo
 
-	vars := mux.Vars(r)
+	decoder := json.NewDecoder(r.Body)
 
-	routeID := vars["ID"]
+	err := decoder.Decode(&service)
 
-	routes := kong.GetRouteByServiceID(routeID)
-
-	jsonResult, err := json.Marshal(routes)
-
-	if err == nil {
-
-		w.Write(jsonResult)
-
-	} else {
-
-		log.Panic(err)
-
+	if err != nil {
+		panic(err)
 	}
+
+	route := kong.GetRouteByServiceID(service)
+
+	json.NewEncoder(w).Encode(&route)
 
 }
 

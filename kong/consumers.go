@@ -59,7 +59,7 @@ func GetConsumers() []models.ConsumersInfo {
 }
 
 //GetConsumerByID Retorna um Consumer pelo seu ID.
-func GetConsumerByID(ID string) models.ConsumersInfo {
+func GetConsumerByID(consumer models.ConsumersInfo) models.ConsumersInfo {
 
 	var p models.ConsumersInfo
 
@@ -78,14 +78,15 @@ func GetConsumerByID(ID string) models.ConsumersInfo {
 
 	if err == nil {
 
-		consumer, err := gokong.NewClient(gokong.NewDefaultConfig()).Consumers().GetById(ID)
+		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Consumers().GetById(consumer.ID)
+
 		if err == nil {
 
-			if consumer != nil {
+			if result != nil {
 
 				p = models.ConsumersInfo{
-					ID:       consumer.Id,
-					Username: consumer.Username,
+					ID:       result.Id,
+					Username: result.Username,
 				}
 
 			}
@@ -102,7 +103,7 @@ func GetConsumerByID(ID string) models.ConsumersInfo {
 }
 
 //GetConsumerByName Retorna um Consumer pelo seu Name.
-func GetConsumerByName(Name string) models.ConsumersInfo {
+func GetConsumerByName(consumer models.ConsumersInfo) models.ConsumersInfo {
 
 	var p models.ConsumersInfo
 
@@ -121,15 +122,15 @@ func GetConsumerByName(Name string) models.ConsumersInfo {
 
 	if err == nil {
 
-		consumer, err := gokong.NewClient(gokong.NewDefaultConfig()).Consumers().GetByUsername(Name)
+		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Consumers().GetByUsername(consumer.Username)
 
 		if err == nil {
 
-			if consumer != nil {
+			if result != nil {
 
 				p = models.ConsumersInfo{
-					ID:       consumer.Id,
-					Username: consumer.Username,
+					ID:       result.Id,
+					Username: result.Username,
 				}
 
 			}
@@ -142,5 +143,50 @@ func GetConsumerByName(Name string) models.ConsumersInfo {
 	}
 
 	return p
+
+}
+
+//CreateConsumer Criar um consumer, CustomID "".
+func CreateConsumer(consumer models.ConsumersInfo) models.ConsumersInfo {
+
+	var c models.ConsumersInfo
+
+	consumerRequest := &gokong.ConsumerRequest{
+		Username: consumer.Username,
+		CustomId: "",
+	}
+
+	kongClient := gokong.NewClient(gokong.NewDefaultConfig())
+
+	status, err := kongClient.Status().Get()
+
+	if status == nil {
+
+		fmt.Println("Falha na verificação de status.")
+
+		log.Panic("Status failed")
+
+	}
+
+	consumerCreated, err := kongClient.Consumers().Create(consumerRequest)
+
+	if err == nil {
+
+		c = models.ConsumersInfo{
+			ID:       consumerCreated.Id,
+			Username: consumerCreated.Username,
+		}
+
+	} else {
+
+		fmt.Errorf("Err: %s", err)
+
+		//fmt.Println("Falha ao criar Consumer.")
+
+		//log.Panic("Consumer Create failed")
+
+	}
+
+	return c
 
 }

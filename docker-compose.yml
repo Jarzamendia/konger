@@ -12,6 +12,7 @@ services:
       KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
       KONG_PG_USER: ${KONG_PG_USER:-kong}
     networks:
+      - kong-net
     deploy:
       replicas: 1
       restart_policy:
@@ -63,8 +64,8 @@ services:
 
 
 volumes:
-    kong_data: {}
-    konga_data: {}
+  kong_data: {}
+  konga_data: {}
 
 networks:
   kong-net:

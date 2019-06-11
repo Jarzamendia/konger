@@ -8,60 +8,8 @@ import (
 	"github.com/kevholditch/gokong"
 )
 
-//GetRoutes Get all routes.
-func GetRoutes() {
-
-	//var list []RouteInfo
-
-	//Open a new connection.
-	kongClient := gokong.NewClient(gokong.NewDefaultConfig())
-
-	status, err := kongClient.Status().Get()
-
-	if status == nil {
-
-		fmt.Println("Falha na verificação de status.")
-
-		log.Panic("Status failed")
-	}
-
-	if err == nil {
-
-		query := &gokong.RouteQueryString{
-			Offset: 0,
-			Size:   100,
-		}
-
-		fmt.Println(query)
-
-		routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().List(query)
-
-		fmt.Println("Routes verificadas.")
-
-		if err == nil {
-
-			for _, route := range routes {
-
-				fmt.Println(gokong.StringValueSlice(route.Hosts))
-
-			}
-
-		} else {
-
-			log.Panic(err)
-
-		}
-
-	} else {
-
-		log.Panic(err)
-
-	}
-
-}
-
 //GetRouteByServiceID Retorna uma rota pelo ID.
-func GetRouteByServiceID(ID string) []models.RouteInfo {
+func GetRouteByServiceID(service models.ServiceInfo) []models.RouteInfo {
 
 	var list []models.RouteInfo
 
@@ -79,7 +27,7 @@ func GetRouteByServiceID(ID string) []models.RouteInfo {
 
 	if err == nil {
 
-		routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceId(ID)
+		routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceId(service.ID)
 
 		if err == nil {
 
@@ -113,7 +61,7 @@ func GetRouteByServiceID(ID string) []models.RouteInfo {
 }
 
 //GetRouteByServiceName Retorna uma rota pelo ID.
-func GetRouteByServiceName(Name string) []models.RouteInfo {
+func GetRouteByServiceName(service models.ServiceInfo) []models.RouteInfo {
 
 	var list []models.RouteInfo
 
@@ -131,7 +79,7 @@ func GetRouteByServiceName(Name string) []models.RouteInfo {
 
 	if err == nil {
 
-		routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceName(Name)
+		routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceName(service.Name)
 
 		if err == nil {
 
@@ -161,5 +109,60 @@ func GetRouteByServiceName(Name string) []models.RouteInfo {
 	}
 
 	return list
+
+}
+
+//CreateRouteByServiceID Cria um Route a partir de um ServiceID.
+func CreateRouteByServiceID(route models.RouteInfo) models.RouteInfo {
+
+	var r models.RouteInfo
+
+	routeRequest := &gokong.RouteRequest{
+		Protocols:    gokong.StringSlice([]string{route.Protocols}),
+		Methods:      gokong.StringSlice([]string{route.Methods}),
+		Hosts:        gokong.StringSlice(route.Hosts),
+		StripPath:    gokong.Bool(route.StripPath),
+		PreserveHost: gokong.Bool(route.PreserveHost),
+		Service:      gokong.ToId(route.ServiceID),
+		Paths:        gokong.StringSlice(route.Paths),
+	}
+
+	//Open a new connection.
+	kongClient := gokong.NewClient(gokong.NewDefaultConfig())
+
+	status, err := kongClient.Status().Get()
+
+	if status == nil {
+
+		fmt.Println("Falha na verificação de status.")
+
+		log.Panic("Status failed")
+	}
+
+	if err == nil {
+
+		createdRoute, err := kongClient.Routes().Create(routeRequest)
+
+		if err == nil {
+
+			r = models.RouteInfo{
+				ID:        *createdRoute.Id,
+				Hosts:     gokong.StringValueSlice(createdRoute.Hosts),
+				Paths:     gokong.StringValueSlice(createdRoute.Paths),
+				ServiceID: string(*createdRoute.Service),
+			}
+
+		} else {
+
+			log.Panic(err)
+		}
+
+	} else {
+
+		log.Panic(err)
+
+	}
+
+	return r
 
 }

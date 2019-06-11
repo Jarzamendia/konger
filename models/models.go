@@ -1,5 +1,37 @@
 package models
 
+//RESPONSES
+
+// ServiceInfoResponse type details.
+type ServiceInfoResponse struct {
+	err      bool
+	infoType string
+	result   []ServiceInfo
+}
+
+//RouteInfoResponse type details.
+type RouteInfoResponse struct {
+	err      bool
+	infoType string
+	result   []RouteInfo
+}
+
+//ConsumersInfoResponse type details.
+type ConsumersInfoResponse struct {
+	err      bool
+	infoType string
+	result   []ConsumersInfo
+}
+
+//PluginInfoResponse type details.
+type PluginInfoResponse struct {
+	err      bool
+	infoType string
+	result   []PluginInfo
+}
+
+//TYPES
+
 // ServiceInfo type details.
 type ServiceInfo struct {
 	ID       string // ID do serviço.
@@ -13,10 +45,14 @@ type ServiceInfo struct {
 
 //RouteInfo type details.
 type RouteInfo struct {
-	ID        string   //ID do Route
-	Hosts     []string //Hosts configurados
-	Paths     []string //Paths acessiveis.
-	ServiceID string   //ID do service vinculado.
+	ID           string   //ID do Route
+	Hosts        []string //Hosts configurados
+	Paths        []string //Paths acessiveis.
+	Protocols    string
+	Methods      string
+	StripPath    bool
+	PreserveHost bool
+	ServiceID    string //ID do service vinculado.
 }
 
 //PluginInfo type details.

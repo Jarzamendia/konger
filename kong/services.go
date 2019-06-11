@@ -85,7 +85,7 @@ func GetServices() []models.ServiceInfo {
 }
 
 //GetServiceByID Retorna um service pelo ID.
-func GetServiceByID(ID string) models.ServiceInfo {
+func GetServiceByID(service models.ServiceInfo) models.ServiceInfo {
 
 	var s models.ServiceInfo
 	var routeList []models.RouteInfo
@@ -105,11 +105,11 @@ func GetServiceByID(ID string) models.ServiceInfo {
 
 	if err == nil {
 
-		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Services().GetServiceById(ID)
+		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Services().GetServiceById(service.ID)
 
 		if err == nil {
 
-			routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceId(ID)
+			routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceId(service.ID)
 
 			if err == nil {
 
@@ -155,7 +155,7 @@ func GetServiceByID(ID string) models.ServiceInfo {
 }
 
 //GetServiceByName Retorna um service pelo Nome.
-func GetServiceByName(Name string) models.ServiceInfo {
+func GetServiceByName(service models.ServiceInfo) models.ServiceInfo {
 
 	var s models.ServiceInfo
 	var routeList []models.RouteInfo
@@ -175,11 +175,11 @@ func GetServiceByName(Name string) models.ServiceInfo {
 
 	if err == nil {
 
-		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Services().GetServiceByName(Name)
+		result, err := gokong.NewClient(gokong.NewDefaultConfig()).Services().GetServiceByName(service.Name)
 
 		if err == nil {
 
-			routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceName(Name)
+			routes, err := gokong.NewClient(gokong.NewDefaultConfig()).Routes().GetRoutesFromServiceName(service.Name)
 
 			if err == nil {
 
@@ -206,6 +206,61 @@ func GetServiceByName(Name string) models.ServiceInfo {
 				Path:     *result.Path,
 				Port:     *result.Port,
 				Routes:   routeList,
+			}
+
+		} else {
+
+			log.Panic(err)
+
+		}
+
+	} else {
+
+		log.Panic(err)
+
+	}
+
+	return s
+
+}
+
+//CreateService Cria um serviço.
+func CreateService(service models.ServiceInfo) models.ServiceInfo {
+
+	var s models.ServiceInfo
+
+	serviceRequest := &gokong.ServiceRequest{
+		Name:     gokong.String(service.Name),
+		Protocol: gokong.String(service.Protocol),
+		Host:     gokong.String(service.Hosts),
+	}
+
+	//Open a new connection.
+	kongClient := gokong.NewClient(gokong.NewDefaultConfig())
+
+	status, err := kongClient.Status().Get()
+
+	if status == nil {
+
+		fmt.Println("Falha na verificação de status.")
+
+		log.Panic("Status failed")
+
+	}
+
+	if err == nil {
+
+		result, err := kongClient.Services().Create(serviceRequest)
+
+		if err == nil {
+
+			s = models.ServiceInfo{
+				ID:       *result.Id,
+				Name:     *result.Name,
+				Hosts:    *result.Host,
+				Protocol: *result.Protocol,
+				Path:     *result.Path,
+				Port:     *result.Port,
 			}
 
 		} else {

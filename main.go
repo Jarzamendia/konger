@@ -11,25 +11,27 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jarzamendia/konger/controllers"
-	"github.com/jarzamendia/konger/kong"
 )
 
 func main() {
 
-	kong.GetPlugins()
-
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", controllers.HomeHandler).Methods("GET")
-	r.HandleFunc("/services", controllers.ServicesHandler).Methods("GET")
-	r.HandleFunc("/servicesbyid/{ID}", controllers.ServicesIDHandler).Methods("GET")
-	r.HandleFunc("/servicesbyname/{Name}", controllers.ServicesNameHandler).Methods("GET")
-	r.HandleFunc("/consumers", controllers.ConsumersHandler).Methods("GET")
-	r.HandleFunc("/consumersbyid/{ID}", controllers.ConsumersIDHandler).Methods("GET")
-	r.HandleFunc("/consumersbyname/{Name}", controllers.ConsumersNameHandler).Methods("GET")
-	r.HandleFunc("/routesbyserviceid/{ID}", controllers.RoutesIDHandler).Methods("GET")
-	r.HandleFunc("/routesbyservicename/{Name}", controllers.RoutesNameHandler).Methods("GET")
-	r.HandleFunc("/plugins", controllers.PluginsHandler).Methods("GET")
+
+	r.HandleFunc("/service/all", controllers.ServicesHandler).Methods("GET")
+	r.HandleFunc("/service/id", controllers.ServicesIDHandler).Methods("POST")
+	r.HandleFunc("/service/name", controllers.ServicesNameHandler).Methods("POST")
+
+	r.HandleFunc("/consumer/all", controllers.ConsumersHandler).Methods("GET")
+	r.HandleFunc("/consumer/id", controllers.ConsumersIDHandler).Methods("POST")
+	r.HandleFunc("/consumer/name", controllers.ConsumersNameHandler).Methods("POST")
+	r.HandleFunc("/consumer/create", controllers.ConsumersCreateNameHandler).Methods("POST")
+
+	r.HandleFunc("/route/id", controllers.RoutesIDHandler).Methods("POST")
+	r.HandleFunc("/route/name", controllers.RoutesNameHandler).Methods("POST")
+
+	r.HandleFunc("/plugin/all", controllers.PluginsHandler).Methods("GET")
 
 	http.Handle("/", r)
 
